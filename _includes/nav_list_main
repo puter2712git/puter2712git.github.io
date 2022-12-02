@@ -33,5 +33,15 @@
                 {% endfor %}
             </ul>
       </li>
+      <li>
+        <span class="nav__sub-title">Unity Projects</span>
+          <ul>
+              {% for category in site.categories %}
+                {% if category[0] == "Hide and Seek" %}
+                  <li><a href="/categories/hide-and-seek" class="">Hide and Seek ({{category[1].size}})</a></li>
+                {% endif %}
+              {% endfor %}
+          </ul>
+      </li>
   </ul>
 </nav>
