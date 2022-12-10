@@ -1,5 +1,5 @@
 ---
-title: "Hide and Seek (1) - 멀티플레이를 위한 Netcode 설치"
+title: "Hide and Seek (1) - 기본 구성"
 excerpt: "Hide and Seek - (1)"
 
 categories:
@@ -12,117 +12,107 @@ toc: true
 toc_sticky: true
 
 date: 2022-12-02
-last_modified_at: 2022-12-02
+last_modified_at: 2022-12-03
 ---
 
-## 1. Netcode 설치
+## 1. 기본 맵
 
-1. 메뉴바에서, **Window** -> **Package Manager**를 클릭
-2. 왼쪽 상단의 **+** 버튼을 누르고 **Add package by name**을 클릭
-3. 나타나는 팝업 창에 `com.unity.netcode.gameobjects`을 검색
-4. 오른쪽 하단의 **Install**을 클릭
+![image](https://user-images.githubusercontent.com/85764911/205439356-5e22125a-1de7-44ab-a9b5-0dde6b9292a4.png)
 
-## 2. 멀티플레이 테스트
+외부에서 에셋을 가져와서 간단하게 평지를 제작 (후에 scale up)
 
-**Network Manager** 생성
+## 2. 기본 플레이어
 
-1. **Hierarchy** 탭에서 **Create Empty**로 빈 `GameObject` 생성
-2. `GameObject`의 이름을 `NetworkManager`로 변경
-3. `NetworkManager` 오브젝트에 `Network Manager` 컴포넌트 추가
-4. `Network Manager` 컴포넌트 탭의 `Network Transport`의 필드를 `Unity Transport`로 설정
+![image](https://user-images.githubusercontent.com/85764911/205439649-74c39d96-76c3-4fdd-bf1a-6b4f757804b2.png)
 
-<br>
+또한 외부 에셋으로 플레이어 캐릭터를 생성
 
-멀티플레이를 위한 **Player** 생성
-
-1. **Hierarchy** 탭에서 **3D Object** -> **Capsule** 생성, 이름을 `Player`로 변경
-2. `Player` 오브젝트에 `Network Object` 컴포넌트 추가
-3. `Player` 오브젝트를 **Prefab**으로 추가
-4. `NetworkManager` 오브젝트의 `Network Manager` 컴포넌트의 `Player Prefab` 필드에 `Player` 프리팹 드래그&드롭
-5. **Scene**의 `Player` 오브젝트 제거
-
-<br>
-
-현재 씬을 **Build**에 포함시키기
-
-1. 메뉴바에서, **File** -> **Build Settings** 클릭
-2. **Add Open Scenes** 클릭 (현재 씬을 **Build**에 추가)
-
-<br>
-
-**Build**에 도움을 주는 **Command Line Helper** 생성
-
-1. `NetworkCommandLine`의 이름으로 **C# Script** 생성
-2. `NetworkManager` 오브젝트의 자식으로 빈 `GameObject` 생성, 이름을 `NetworkCommandLine`으로 변경
-3. `NetworkCommandLine`에 `NetworkCommandLine.cs` 컴포넌트 추가
-4. `NetworkCommandLine.cs`를 다음과 같이 수정
+## 3. 플레이어 WASD moving
 
 ```cs
+using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
-public class NetworkCommandLine : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
-  private NetworkManager netManager;
+	[SerializeField]
+	private float _walkSpeed;
+	private Rigidbody _rigidbody;
 
-  private void Start()
-  {
-    netManager = GetComponentInParent<NetworkManager>();
+	private void Awake()
+	{
+		_rigidbody = GetComponent<Rigidbody>();
+	}
 
-    if (Application.isEditor) return;
+	private void FixedUpdate()
+	{
+		Move();
+	}
 
-    var args = GetCommandlineArgs();
+	private void Move()
+	{
+		float _moveX = Input.GetAxisRaw("Horizontal");
+		float _moveZ = Input.GetAxisRaw("Vertical");
 
-    if (args.TryGetValue("-mode", out string mode))
-    {
-      switch (mode)
-      {
-        case "server":
-          netManager.StartServer();
-          break;
-        case "host":
-          netManager.StartHost();
-          break;
-        case "client":
-          netManager.StartClient();
-          break;
-      }
-    }
-  }
+		Vector3 _moveHorizontal = transform.right * _moveX;
+		Vector3 _moveVertical = transform.forward * _moveZ;
 
-  private Dictionary<string, string> GetCommandlineArgs()
-  {
-    Dictionary<string, string> argDictionary = new Dictionary<string, string>();
+		Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * _walkSpeed;
 
-    var args = System.Environment.GetCommandLineArgs();
-
-    for (int i = 0; i < args.Length; i++)
-    {
-      var arg = args[i].ToLower();
-      if (arg.StartsWith("-"))
-      {
-        var value = i < args.Length - 1 ? args[i + 1].ToLower() : null;
-        value = (value?.StartsWith("-") ?? false) ? null : value;
-
-        argDictionary.Add(arg, value);
-      }
-    }
-    return argDictionary;
-  }
+		_rigidbody.MovePosition(gameObject.transform.position + _velocity * Time.deltaTime);
+	}
 }
 ```
-위 코드는 **Command Line Interface**에서 입력되는 명령어에 따라게임을 각각 **Server**, **Host**, **Client**로 실행할지 구분해주는 기능을 한다.
+
+널리 알려진 이동 스크립트
+
+## 4. 플레이어 마우스 rotating
+
+이제 위 스크립트에 추가로 마우스의 이동에 따라 플레이어가 회전하도록 추가할 것이다.
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+	...
+
+	/* Variables for rotating */
+	[SerializeField]
+	private float _mouseSensitivity;
+	[SerializeField]
+	private GameObject _neck;
+	[SerializeField]
+	private GameObject _body;
+
+	...
+
+	private void Update()
+	{
+		Rotate();
+	}
+
+	...
+
+	private void Rotate()
+	{
+		float _rotateSpeedX = Input.GetAxisRaw("Mouse X") * _mouseSensitivity * Time.deltaTime;
+
+		_neck.transform.Rotate(new Vector3(0f, _rotateSpeedX, 0f));
+		if (Mathf.Abs(_neck.transform.rotation.eulerAngles.y - _body.transform.rotation.eulerAngles.y) > 35)
+		{
+			_body.transform.Rotate(new Vector3(-_rotateSpeedX, 0f, 0f));
+			_neck.transform.Rotate(new Vector3(0f, -_rotateSpeedX, 0f));
+		}
+	}
+}
+```
+
+위에서 생성한 캐릭터는 **Rigged**된 3D Model이다.
 
 
-<br>
+내가 의도한 캐릭터 회전은 마인크래프트와 비슷한 방식으로, 마우스가 회전하면 우선 머리만 그에 따라 회전하도록 하고, 만약 머리가 자신의 몸에 비해 과도하게 회전됐다면 그걸 감지해 몸도 함께 회전되도록 하는 방식이다.
 
-**Command line helper** 테스트하기
-
-1. **File** -> **Build and Run** 클릭
-2. 프로젝트 폴더에 **Build** 폴더를 생성하고 그 안에 실행파일 저장
-3. **CLI**에서 다음의 명령을 입력
-
-    - `<path to project>/Build/<program name>.exe - mode { server | host | client }`
-
-이제 서버를 통해 게임을 실행시키고 또 다른 **CLI**를 통해 클라이언트로 게임을 실행시키면 두 게임 화면 모두에 `Player` 프리팹이 나타나는 것을 볼 수 있다.
