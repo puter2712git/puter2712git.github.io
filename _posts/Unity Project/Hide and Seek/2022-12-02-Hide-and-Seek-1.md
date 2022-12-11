@@ -12,22 +12,16 @@ toc: true
 toc_sticky: true
 
 date: 2022-12-02
-last_modified_at: 2022-12-03
+last_modified_at: 2022-12-11
 ---
 
-## 1. 기본 맵
+## 1. 기본 구성
+![image](https://user-images.githubusercontent.com/85764911/206886086-421af029-cd37-4c4e-836f-8c8cc0d6f799.png)
+**Plane**으로 맵과 **Capsule**로 플레이어 생성
 
-![image](https://user-images.githubusercontent.com/85764911/205439356-5e22125a-1de7-44ab-a9b5-0dde6b9292a4.png)
+<br>
 
-외부에서 에셋을 가져와서 간단하게 평지를 제작 (후에 scale up)
-
-## 2. 기본 플레이어
-
-![image](https://user-images.githubusercontent.com/85764911/205439649-74c39d96-76c3-4fdd-bf1a-6b4f757804b2.png)
-
-또한 외부 에셋으로 플레이어 캐릭터를 생성
-
-## 3. 플레이어 WASD moving
+## 2. 플레이어 Input 감지
 
 ```cs
 using System.Collections;
@@ -36,6 +30,47 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+	private float _horizontalKeyInput;
+	private float _verticalKeyInput;
+	private float _xMouseInput;
+	private float _yMouseInput;
+
+	[SerializeField]
+	private float _walkSpeed;
+
+	private void Update()
+	{
+		DetectInput();
+	}
+
+	private void DetectInput()
+	{
+		_horizontalKeyInput = Input.GetAxisRaw("Horizontal");
+		_verticalKeyInput = Input.GetAxisRaw("Vertical");
+
+		_xMouseInput = Input.GetAxisRaw("Mouse X");
+		_yMouseInput = Input.GetAxisRaw("Mouse Y");
+	}
+}
+```
+매 프레임마다 **Input**을 감지하는 코드
+
+<br>
+
+## 3. 플레이어 WASD 이동
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+	private float _horizontalKeyInput;
+	private float _verticalKeyInput;
+	private float _xMouseInput;
+	private float _yMouseInput;
+
 	[SerializeField]
 	private float _walkSpeed;
 	private Rigidbody _rigidbody;
@@ -45,31 +80,41 @@ public class PlayerController : MonoBehaviour
 		_rigidbody = GetComponent<Rigidbody>();
 	}
 
+	private void Update()
+	{
+		DetectInput();
+	}
+
 	private void FixedUpdate()
 	{
 		Move();
 	}
 
+	private void DetectInput()
+	{
+		_horizontalKeyInput = Input.GetAxisRaw("Horizontal");
+		_verticalKeyInput = Input.GetAxisRaw("Vertical");
+
+		_xMouseInput = Input.GetAxisRaw("Mouse X");
+		_yMouseInput = Input.GetAxisRaw("Mouse Y");
+	}
+
 	private void Move()
 	{
-		float _moveX = Input.GetAxisRaw("Horizontal");
-		float _moveZ = Input.GetAxisRaw("Vertical");
+		Vector3 moveHorizontal = transform.right * _horizontalKeyInput;
+		Vector3 moveVertical = transform.forward * _verticalKeyInput;
 
-		Vector3 _moveHorizontal = transform.right * _moveX;
-		Vector3 _moveVertical = transform.forward * _moveZ;
+		Vector3 velocity = (moveHorizontal + moveVertical).normalized * _walkSpeed;
 
-		Vector3 _velocity = (_moveHorizontal + _moveVertical).normalized * _walkSpeed;
-
-		_rigidbody.MovePosition(gameObject.transform.position + _velocity * Time.deltaTime);
+		_rigidbody.MovePosition(transform.position + velocity * Time.deltaTime);
 	}
 }
 ```
+**Input** 값을 받아서 `Rigidbody` 컴포넌트로 위치를 변경하는 함수를 만들고, `FixedUpdate()`에서 이를 실행
 
-널리 알려진 이동 스크립트
+<br>
 
-## 4. 플레이어 마우스 rotating
-
-이제 위 스크립트에 추가로 마우스의 이동에 따라 플레이어가 회전하도록 추가할 것이다.
+## 4. 플레이어 좌우 회전
 
 ```cs
 using System.Collections;
@@ -78,41 +123,176 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+	private float _horizontalKeyInput;
+	private float _verticalKeyInput;
+	private float _xMouseInput;
+	private float _yMouseInput;
+
+	[SerializeField]
+	private float _walkSpeed;
+	private Rigidbody _rigidbody;
+
+	[SerializeField]
+	private Camera _camera;
+	[SerializeField]
+	private float _rotateSpeed;
+
+	private void Awake()
+	{
+		_rigidbody = GetComponent<Rigidbody>();
+	}
+
+	private void Update()
+	{
+		DetectInput();
+		CharacterRotate();
+	}
+
 	...
 
-	/* Variables for rotating */
+	private void CharacterRotate()
+	{
+		Vector3 yRotation = new Vector3(0f, _xMouseInput, 0f) * _rotateSpeed;
+		_rigidbody.MoveRotation(_rigidbody.rotation * Quaternion.Euler(yRotation));
+	}
+}
+```
+매 프레임마다 플레이어의 y축 회전값을 변경
+
+<br>
+
+## 5. 카메라 상하 회전
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+	private float _horizontalKeyInput;
+	private float _verticalKeyInput;
+	private float _xMouseInput;
+	private float _yMouseInput;
+
 	[SerializeField]
-	private float _mouseSensitivity;
+	private float _walkSpeed;
+	private Rigidbody _rigidbody;
+
 	[SerializeField]
-	private GameObject _neck;
+	private Camera _camera;
 	[SerializeField]
-	private GameObject _body;
+	private float _rotateSpeed;
+	private float _currentCameraRotationX;
+	private const float CAMERA_ROTATION_LIMIT = 80;
 
 	...
 
 	private void Update()
 	{
-		Rotate();
+		DetectInput();
+		CharacterRotate();
+		CameraRotate();
 	}
 
 	...
 
-	private void Rotate()
+	private void CameraRotate()
 	{
-		float _rotateSpeedX = Input.GetAxisRaw("Mouse X") * _mouseSensitivity * Time.deltaTime;
+		float xRotation = _yMouseInput * _rotateSpeed;
 
-		_neck.transform.Rotate(new Vector3(0f, _rotateSpeedX, 0f));
-		if (Mathf.Abs(_neck.transform.rotation.eulerAngles.y - _body.transform.rotation.eulerAngles.y) > 35)
+		_currentCameraRotationX -= xRotation;
+		_currentCameraRotationX = Mathf.Clamp(_currentCameraRotationX, -CAMERA_ROTATION_LIMIT, CAMERA_ROTATION_LIMIT);
+
+		_camera.transform.localEulerAngles = new Vector3(_currentCameraRotationX, 0f, 0f);
+	}
+}
+```
+플레이어의 상하 회전은 카메라가 대신한다. <br>
+카메라 오브젝트를 받아서 매 프레임마다 카메라의 회전각을 변경해준다.
+
+<br>
+
+## 6. 점프 구현하기
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+	private float _horizontalKeyInput;
+	private float _verticalKeyInput;
+	private float _xMouseInput;
+	private float _yMouseInput;
+	private bool _spacebarInput;
+
+	[SerializeField]
+	private float _walkSpeed;
+	private Rigidbody _rigidbody;
+
+	[SerializeField]
+	private Camera _camera;
+	[SerializeField]
+	private float _rotateSpeed;
+	private float _currentCameraRotationX;
+	private const float CAMERA_ROTATION_LIMIT = 80;
+
+	[SerializeField]
+	private float _jumpPower;
+	private bool _isJumping;
+
+	private void Awake()
+	{
+		_rigidbody = GetComponent<Rigidbody>();
+		_isJumping = false;
+	}
+
+	...
+
+	private void FixedUpdate()
+	{
+		Move();
+		Jump();
+	}
+
+	private void DetectInput()
+	{
+		_horizontalKeyInput = Input.GetAxisRaw("Horizontal");
+		_verticalKeyInput = Input.GetAxisRaw("Vertical");
+
+		_xMouseInput = Input.GetAxisRaw("Mouse X");
+		_yMouseInput = Input.GetAxisRaw("Mouse Y");
+
+		_spacebarInput = Input.GetKey(KeyCode.Space);
+	}
+
+	...
+
+	private void Jump()
+	{
+		if (_spacebarInput)
 		{
-			_body.transform.Rotate(new Vector3(-_rotateSpeedX, 0f, 0f));
-			_neck.transform.Rotate(new Vector3(0f, -_rotateSpeedX, 0f));
+			if (!_isJumping)
+			{
+				_isJumping = true;
+				_rigidbody.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
+			}
+		}
+	}
+
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.CompareTag("Ground"))
+		{
+			_isJumping = false;
 		}
 	}
 }
 ```
+`_spacebarInput`으로 Spacebar 입력을 감지 <br>
+`_isJumping`으로 현재 점프하고 있는지를 감지 <br>
+만약 점프 뛰고 있지 않다면 `Rigidbody` 컴포넌트에 위 방향으로 힘을 줌 <br>
 
-위에서 생성한 캐릭터는 **Rigged**된 3D Model이다.
-
-
-내가 의도한 캐릭터 회전은 마인크래프트와 비슷한 방식으로, 마우스가 회전하면 우선 머리만 그에 따라 회전하도록 하고, 만약 머리가 자신의 몸에 비해 과도하게 회전됐다면 그걸 감지해 몸도 함께 회전되도록 하는 방식이다.
-
+`OnCollisionEnter()`를 통해 바닥에 닿았다면 `_isJumping`을 `false`로 전환
