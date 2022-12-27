@@ -13,6 +13,8 @@ toc_sticky: true
 
 date: 2022-12-17
 last_modified_at: 2022-12-17
+
+use_math: true
 ---
 
 ## 1. Queue란?
