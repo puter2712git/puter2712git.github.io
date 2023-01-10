@@ -44,13 +44,23 @@
             </ul>
       </li>
       <li>
-        <span class="nav__sub-title">Unity Projects</span>
+        <span class="nav__sub-title">Unity</span>
           <ul>
               {% for category in site.categories %}
                 {% if category[0] == "Sneaking" %}
                   <li><a href="/categories/sneaking" class="">Sneaking ({{category[1].size}})</a></li>
                 {% endif %}
               {% endfor %}
+          </ul>
+      </li>
+      <li>
+        <span class="nav__sub-title">Cocos Creator</span>
+          <ul>
+            {% for category in site.categories %}
+              {% if category[0] == "Mind Your Step" %}
+                <li><a href="/categories/mind-your-step" class="">Mind Your Step ({{cateogry[1].size}})</a></li>
+              {% endif %}
+            {% endfor %}
           </ul>
       </li>
   </ul>
