@@ -16,7 +16,7 @@ minimal_mistakes_skin: "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon
 
 # Site Settings
 locale: "en-US"
-title: "EP"
+title: "EP Blog"
 title_separator: "-"
 subtitle: # site tagline that appears below site title in masthead
 name: "Dongjin Kuk"
@@ -247,6 +247,7 @@ defaults:
       layout: single
       author_profile: true
       read_time: true
+      sidebar_main: true
       comments: # true
-      share: true
-      related: true
+      share: false
+      related: false
