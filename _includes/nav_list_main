@@ -10,15 +10,25 @@
       <li>
         📂 <span style="font-family:'Cafe24Oneprettynight';">전체 글 수</style> <span style="font-family:'Coming Soon';">{{sum}}</style> <span style="font-family:'Cafe24Oneprettynight';">개</style> 
       </li>
+	  <li>
+		<span class="nav__sub-title">Computer Science</span>
+		<ul>
+		  {% for category in site.categories %}
+		    {% if category[0] == "Data Structure" %}
+			  <li><a href="categories/data-structure" class="">Data Structure ({{category[1].size}})</a></li>
+			{% endif %}
+		  {% endfor %}
+		</ul>
+	  </li>
       <li>
-        <span class="nav__sub-title">Test</span>
-          <ul>
-            {% for category in site.categories %}
-              {% if category[0] == "Test" %}
-                <li><a href="/categories/test" class="">Test ({{category[1].size}})</a></li>
-              {% endif %}
-            {% endfor %}
-          </ul>
+        <span class="nav__sub-title">Problem Solving</span>
+        <ul>
+          {% for category in site.categories %}
+            {% if category[0] == "Baekjoon" %}
+              <li><a href="/categories/baekjoon" class="">Baekjoon ({{category[1].size}})</a></li>
+            {% endif %}
+          {% endfor %}
+        </ul>
       </li>
   </ul>
 </nav>
