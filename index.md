@@ -1,6 +1,10 @@
 ---
 layout: home
-title: puter2712git 블로그
+title: Project Archive
+nav_exclude: true
 ---
 
-환영합니다! 이곳은 GitHub Pages와 Jekyll로 만든 블로그입니다.
+프로젝트들의 작업 과정을 기록해둔 아카이브입니다.
+
+---
+<br>
