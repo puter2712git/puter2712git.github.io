@@ -3,3 +3,10 @@ description: Recording of Development
 baseurl: ""
 url: "https://puter2712git.github.io"
 theme: minima
+minima:
+  skin: classic
+  custom_css:
+    - /assets/main.scss
+
+sass:
+  style: compressed
