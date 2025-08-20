@@ -10,3 +10,6 @@ minima:
 
 sass:
   style: compressed
+
+include:
+  - project
