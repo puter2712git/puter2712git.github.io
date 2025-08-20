@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "URay Engine"
-permalink: /project/uray_engine
+perma_link: /project/uray_engine
 nav_exclude: true
 ---
 
