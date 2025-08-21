@@ -5,7 +5,6 @@ permalink: /project/uray_engine
 nav_exclude: true
 ---
 
-Test
 <ul>
 	{% for post in site.categories.uray_engine %}
 		<li>
