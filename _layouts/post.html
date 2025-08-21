@@ -23,12 +23,16 @@ layout: default
   </div>
 
   <footer class="post-footer">
-    <nav class="post-nav">
+    <nav class="post-nav" style="display: flex; justify-content: space-between;">
       {% if page.previous %}
         <a class="post-prev" href="{{ page.previous.url }}">&larr; {{ page.previous.title }}</a>
+      {% else %}
+        <span></span>
       {% endif %}
       {% if page.next %}
         <a class="post-next" href="{{ page.next.url }}">{{ page.next.title }} &rarr;</a>
+      {% else %}
+        <span></span>
       {% endif %}
     </nav>
   </footer>
