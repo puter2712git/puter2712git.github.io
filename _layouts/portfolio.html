@@ -1,0 +1,67 @@
+---
+layout: page
+---
+
+<div class="row row-cols-1 row-cols-md-2 g-5"> <div class="col">
+    <div class="card h-100 bg-transparent border-0 position-relative">
+      <h3 class="card-title mt-0 mb-3 fw-bold text-uppercase" style="letter-spacing: 1px;">
+        <a href="/portfolio/metaply" class="stretched-link text-decoration-none color-inherit">메타플리 (2024)</a>
+      </h3>
+      
+      <img src="{{ site.cdn }}/기계학습_HW4_리더보드_이미지.png" class="card-img-top rounded-0" alt="Metaply">
+      
+      <div class="card-body px-0 pt-4">
+        <p class="card-text mb-2"><span class="fw-bold">Role:</span> 클라이언트 프로그래머</p>
+        <p class="card-text mb-2"><span class="fw-bold">Contributions:</span> 렌더링 최적화 및 데이터 툴 제작. 오픈월드 환경에서의 메모리 관리 및 프레임 드랍 문제 해결.</p>
+        <p class="card-text mb-2"><span class="fw-bold">Engine & Tools:</span> Unity, C#, Jenkins</p>
+        <p class="card-text mb-2 text-muted italic">"프로젝트의 기술적 완성도를 높이는 데 기여함"</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="card h-100 bg-transparent border-0 position-relative">
+      <h3 class="card-title mt-0 mb-3 fw-bold text-uppercase">Project Name (Year)</h3>
+      <img src="/assets/img/project2.png" class="card-img-top rounded-0" alt="...">
+      <div class="card-body px-0 pt-4">
+        </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  /* 폰트 및 기본 컬러 설정 */
+  .card-title {
+    font-size: 1.25rem;
+    color: var(--main-color); /* Chirpy 기본 텍스트 색상 사용 */
+  }
+
+  .card-img-top {
+    aspect-ratio: 16 / 9; /* 이미지 비율 통일 */
+    object-fit: cover;
+    filter: brightness(0.9); /* 이미지 톤을 살짝 낮춰 고급스럽게 */
+    transition: filter 0.3s ease;
+  }
+
+  .card:hover .card-img-top {
+    filter: brightness(1.1); /* 호버 시 밝아짐 */
+  }
+
+  /* 텍스트 스타일링 */
+  .card-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #8e8e8e; /* 이미지와 비슷한 회색톤 */
+  }
+
+  .fw-bold {
+    color: var(--text-color); /* 라벨은 좀 더 진하게 */
+    margin-right: 5px;
+  }
+
+  /* 링크 색상 유지 */
+  .color-inherit {
+    color: inherit !important;
+  }
+</style>
