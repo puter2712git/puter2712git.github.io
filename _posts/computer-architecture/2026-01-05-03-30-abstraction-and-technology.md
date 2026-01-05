@@ -58,7 +58,7 @@ mermaid: true
 <img src="/computer_architecture/abstraction.png" width="50%">
 
 위 abstraction에서 나와있듯이, application과 hardware 사이를 연결해주는 **systems software**가 하드웨어와 복잡한 애플리케이션 사이를 연결해주는 매개체가 됩니다. <br>
-Systems software는 여러 종류가 조재하지만, 오늘날의 컴퓨터 시스템에서는 두 가지가 중심이 됩니다.
+Systems software는 여러 종류가 존재하지만, 오늘날의 컴퓨터 시스템에서는 두 가지가 중심이 됩니다.
 
 ### Operating System
 
